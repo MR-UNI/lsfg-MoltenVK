@@ -3,13 +3,26 @@ project(lsfg-vk LANGUAGES CXX)
 include(GNUInstallDirs)
 
 # === READ HERE FOR BUILD OPTIONS ===
-option(LSFGVK_BUILD_VK_LAYER     "Build the Vulkan layer"            ON)
-option(LSFGVK_BUILD_UI           "Build the user interface"         OFF)
-option(LSFGVK_BUILD_CLI          "Build the command line interface"  ON)
-option(LSFGVK_INSTALL_DEVELOP    "Install development libraries and headers"      OFF)
-option(LSFGVK_INSTALL_XDG_FILES  "Install the application icon and desktop files" OFF)
-set(LSFGVK_LAYER_LIBRARY_PATH liblsfg-vk-layer.so CACHE STRING "Change where Vulkan searches for the layer library")
-option(LSFGVK_TESTING_RENDERDOC  "Enable RenderDoc integration for testing purposes" OFF)
+option(LSFGVK_BUILD_VK_LAYER      "Build the Vulkan layer"                        ON)
+option(LSFGVK_BUILD_UI            "Build the user interface"                      OFF)
+option(LSFGVK_BUILD_CLI           "Build the command line interface"               ON)
+option(LSFGVK_INSTALL_DEVELOP     "Install development libraries and headers"     OFF)
+option(LSFGVK_INSTALL_XDG_FILES   "Install the application icon and desktop files" OFF)
+option(LSFGVK_TESTING_RENDERDOC   "Enable RenderDoc integration for testing purposes" OFF)
+
+# macOS: default library name uses .dylib suffix (handled automatically by CMake)
+if(APPLE)
+    # On macOS the Vulkan loader is provided by the LunarG Vulkan SDK.
+    # Point CMake at the SDK if VULKAN_SDK is set in the environment.
+    if(DEFINED ENV{VULKAN_SDK})
+        list(APPEND CMAKE_PREFIX_PATH "$ENV{VULKAN_SDK}")
+    endif()
+    set(LSFGVK_LAYER_LIBRARY_PATH liblsfg-vk-layer.dylib CACHE STRING
+        "Change where Vulkan searches for the layer library")
+else()
+    set(LSFGVK_LAYER_LIBRARY_PATH liblsfg-vk-layer.so CACHE STRING
+        "Change where Vulkan searches for the layer library")
+endif()
 # === READ HERE FOR BUILD OPTIONS ===
 
 set(CMAKE_CXX_STANDARD 20)
@@ -45,6 +58,11 @@ endif()
 
 if(LSFGVK_TESTING_RENDERDOC)
     add_compile_definitions(LSFGVK_TESTING_RENDERDOC)
+endif()
+
+# macOS-specific compile definitions
+if(APPLE)
+    add_compile_definitions(LSFGVK_MACOS)
 endif()
 
 add_subdirectory(lsfg-vk-common)
