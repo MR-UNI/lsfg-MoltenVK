@@ -121,6 +121,7 @@ void Root::modifyDeviceCreateInfo(VkDeviceCreateInfo& createInfo,
 #endif
             "VK_KHR_timeline_semaphore"
         }
+        );
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
