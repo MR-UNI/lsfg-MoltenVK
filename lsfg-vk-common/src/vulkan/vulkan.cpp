@@ -29,6 +29,16 @@ namespace {
 
         handle = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
         if (!handle) handle = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
+                // Try common macOS MoltenVK locations
+        if (!handle) handle = dlopen("/usr/local/lib/libMoltenVK.dylib", RTLD_NOW | RTLD_LOCAL);
+        if (!handle) handle = dlopen("/opt/homebrew/lib/libMoltenVK.dylib", RTLD_NOW | RTLD_LOCAL);
+        if (!handle) {
+            const char* vulkan_sdk = std::getenv("VULKAN_SDK");
+            if (vulkan_sdk) {
+                std::string moltenvk_path = std::string(vulkan_sdk) + "/lib/libMoltenVK.dylib";
+                handle = dlopen(moltenvk_path.c_str(), RTLD_NOW | RTLD_LOCAL);
+            }
+        }
                 if (!handle) handle = dlopen("libMoltenVK.dylib", RTLD_NOW | RTLD_LOCAL);
         if (!handle)
             throw ls::vulkan_error("failed to load Vulkan library");
