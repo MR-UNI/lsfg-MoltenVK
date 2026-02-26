@@ -110,14 +110,17 @@ void Root::modifyDeviceCreateInfo(VkDeviceCreateInfo& createInfo,
     auto extensions = add_extensions(
         createInfo.ppEnabledExtensionNames,
         createInfo.enabledExtensionCount,
-        {
+                {
             "VK_KHR_external_memory",
+#ifndef __APPLE__
             "VK_KHR_external_memory_fd",
+#endif
             "VK_KHR_external_semaphore",
+#ifndef __APPLE__
             "VK_KHR_external_semaphore_fd",
+#endif
             "VK_KHR_timeline_semaphore"
         }
-    );
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
